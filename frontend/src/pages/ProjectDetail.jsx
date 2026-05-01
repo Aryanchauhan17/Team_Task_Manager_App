@@ -75,7 +75,7 @@ export default function ProjectDetail() {
     e.preventDefault()
     setError('')
     try {
-      await API.post(`/projects/${id}/members`, { userId: memberEmail })
+      await API.post(`/projects/${id}/members`, { email: memberEmail })
       setMemberEmail('')
       setShowMemberModal(false)
       fetchProject()
@@ -378,11 +378,11 @@ export default function ProjectDetail() {
               <div>
                 <label className="text-gray-400 text-sm mb-1 block">User ID</label>
                 <input
-                  type="text"
+                  type="email"
                   value={memberEmail}
                   onChange={(e) => setMemberEmail(e.target.value)}
                   className="w-full bg-gray-800 border border-gray-700 text-white px-4 py-2.5 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
-                  placeholder="Paste user ID"
+                  placeholder="Paste user email"
                   required
                 />
               </div>
