@@ -106,33 +106,41 @@ export const deleteProject = async (req, res, next) => {
 // /api/projects/:id/members
 export const addMember = async (req, res, next) => {
   try {
-    const { userId, role } = req.body;
+    const { email, role } = req.body  
 
-    const project = await Project.findByPk(req.params.id);
+    const project = await Project.findByPk(req.params.id)
     if (!project) {
-      return res.status(404).json({ success: false, message: 'Project not found' });
+      return res.status(404).json({ success: false, message: 'Project not found' })
     }
 
     if (project.ownerId !== req.user.id) {
-      return res.status(403).json({ success: false, message: 'Not authorized' });
+      return res.status(403).json({ success: false, message: 'Not authorized' })
     }
 
-    const user = await User.findByPk(userId);
+    
+    const user = await User.findOne({ where: { email } })
     if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
+      return res.status(404).json({ success: false, message: 'No user found with this email' })
     }
 
-    const existing = await ProjectMember.findOne({ where: { projectId: project.id, userId } });
+    const existing = await ProjectMember.findOne({ 
+      where: { projectId: project.id, userId: user.id } 
+    })
     if (existing) {
-      return res.status(400).json({ success: false, message: 'User already a member' });
+      return res.status(400).json({ success: false, message: 'User already a member' })
     }
 
-    const member = await ProjectMember.create({ projectId: project.id, userId, role: role || 'member' });
-    res.status(201).json({ success: true, member });
+    const member = await ProjectMember.create({ 
+      projectId: project.id, 
+      userId: user.id,  
+      role: role || 'member' 
+    })
+
+    res.status(201).json({ success: true, member })
   } catch (err) {
-    next(err);
+    next(err)
   }
-};
+}
 
 // /api/projects/:id/members/:userId
 export const removeMember = async (req, res, next) => {
